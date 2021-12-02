@@ -1,12 +1,14 @@
 <html>
 <head>
 <title>Registration</title>
+<link rel="stylesheet" href={{ url_for('static', filename='css/login.css') }} />
 <script type="text/javascript" src="{{ url_for('static', filename = 'js/validateForm.js') }}">
 </script>
 </head>
 <body>
 <form action="/register" method="POST" onsubmit="return validate()">
-    <p>Email: <input type="email" name="email"></p>
+    <legend>REGISTER::</legend>
+    <p>Email: <input type="email" name="email" placeholder="name@gmail.com"></p>
 
     <P>Password: <input type="password" name="password" id="password" required></p>
 
@@ -24,7 +26,7 @@
 
     <p><input type="submit" value="Register"></p>
 
-    <a href="/loginForm">Login here</a>
+    <button onclick="location.href='/loginForm'">Login here</button>
 </form>
 </body>
 </html>
