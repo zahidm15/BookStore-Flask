@@ -248,10 +248,18 @@ def cart():
         userId = cur.fetchone()[0]
         cur.execute("SELECT products.productId, products.name, products.price, products.image FROM products, cart WHERE products.productId = cart.productId AND cart.userId = " + str(userId))
         product = cur.fetchall()
-    totalPrice = 0
+    shipment=0
+    postage=3
+    for  row in product:
+        if row[1]==1:
+            
+            shipment=postage
+        elif row[2]>1:    
+            shipment =postage + 1
+    totalPrice = shipment
     for row in product:
         totalPrice += row[2]
-    return render_template("cart.html", product = product, totalPrice=totalPrice, loggedIn=loggedIn, firstName=firstName, noOfItems=noOfItems)
+    return render_template("cart.html", product = product, postage=shipment, totalPrice=totalPrice, loggedIn=loggedIn, firstName=firstName, noOfItems=noOfItems)
 
 @app.route("/removeFromCart")
 def removeFromCart():
