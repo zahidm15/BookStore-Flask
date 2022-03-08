@@ -1,7 +1,7 @@
 from constants import ALLOWED_EXTENSIONS
 
 
-def parse(data):
+def parse(data) -> list[list]:
     ans = []
     i = 0
     while i < len(data):
@@ -15,6 +15,6 @@ def parse(data):
     return ans
 
 
-def allowed_file(filename):
+def allowed_file(filename) -> bool:
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
