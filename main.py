@@ -6,7 +6,7 @@ from flask import *
 from werkzeug.utils import secure_filename
 
 from constants import DB_PATH, UPLOAD_FOLDER, ALLOWED_EXTENSIONS
-from login import getLoginDetails
+from login import get_login_details
 
 app = Flask(__name__)
 app.secret_key = 'random string'
@@ -15,16 +15,19 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route("/")
 def root():
-    loggedIn, firstName, noOfItems = getLoginDetails()
+    logged_in, first_name, no_of_items = get_login_details()
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
         cur.execute('SELECT productId, name, price, description, image, stock, ISBN FROM products')
-        itemData = cur.fetchall()
+        item_data = cur.fetchall()
         cur.execute('SELECT categoryId, name FROM categories')
-        categoryData = cur.fetchall()
-    itemData = parse(itemData)
-    return render_template('home.html', itemData=itemData, loggedIn=loggedIn, firstName=firstName, noOfItems=noOfItems,
-                           categoryData=categoryData)
+        category_data = cur.fetchall()
+    item_data = parse(item_data)
+    return render_template('home.html', itemData=item_data,
+                           loggedIn=logged_in,
+                           firstName=first_name,
+                           noOfItems=no_of_items,
+                           categoryData=category_data)
 
 
 @app.route("/add")
@@ -98,7 +101,7 @@ def removeItem():
 
 @app.route("/displayCategory")
 def displayCategory():
-    loggedIn, firstName, noOfItems = getLoginDetails()
+    loggedIn, firstName, noOfItems = get_login_details()
     categoryId = request.args.get("categoryId")
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
@@ -116,7 +119,7 @@ def displayCategory():
 def profileHome():
     if 'email' not in session:
         return redirect(url_for('root'))
-    loggedIn, firstName, noOfItems = getLoginDetails()
+    loggedIn, firstName, noOfItems = get_login_details()
     return render_template("profileHome.html", loggedIn=loggedIn, firstName=firstName, noOfItems=noOfItems)
 
 
@@ -124,7 +127,7 @@ def profileHome():
 def editProfile():
     if 'email' not in session:
         return redirect(url_for('root'))
-    loggedIn, firstName, noOfItems = getLoginDetails()
+    loggedIn, firstName, noOfItems = get_login_details()
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
         cur.execute(
@@ -218,7 +221,7 @@ def login():
 
 @app.route("/productDescription")
 def productDescription():
-    loggedIn, firstName, noOfItems = getLoginDetails()
+    loggedIn, firstName, noOfItems = get_login_details()
     productId = request.args.get('productId')
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
@@ -255,7 +258,7 @@ def addToCart():
 def cart():
     if 'email' not in session:
         return redirect(url_for('loginForm'))
-    loggedIn, firstName, noOfItems = getLoginDetails()
+    loggedIn, firstName, noOfItems = get_login_details()
     email = session['email']
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
@@ -322,7 +325,7 @@ def is_valid(email, password):
 def payment():
     if 'email' not in session:
         return redirect(url_for('loginForm'))
-    loggedIn, firstName, noOfItems = getLoginDetails()
+    loggedIn, firstName, noOfItems = get_login_details()
     email = session['email']
 
     with sqlite3.connect(DB_PATH) as conn:

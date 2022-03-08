@@ -5,18 +5,18 @@ from flask import session
 from constants import DB_PATH
 
 
-def getLoginDetails():
+def get_login_details() -> tuple[bool, str, int]:
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
         if 'email' not in session:
-            loggedIn = False
-            firstName = ''
-            noOfItems = 0
+            logged_in = False
+            first_name = ''
+            no_of_items = 0
         else:
-            loggedIn = True
+            logged_in = True
             cur.execute("SELECT userId, firstName FROM users WHERE email = '" + session['email'] + "'")
-            userId, firstName = cur.fetchone()
+            userId, first_name = cur.fetchone()
             cur.execute("SELECT count(productId) FROM cart WHERE userId = " + str(userId))
-            noOfItems = cur.fetchone()[0]
+            no_of_items = cur.fetchone()[0]
     conn.close()
-    return loggedIn, firstName, noOfItems
+    return logged_in, first_name, no_of_items
