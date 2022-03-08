@@ -6,7 +6,7 @@ from flask import *
 from werkzeug.utils import secure_filename
 
 from constants import DB_PATH, UPLOAD_FOLDER
-from login import get_login_details
+from login import get_login_details, is_valid
 from utils import parse, allowed_file
 
 app = Flask(__name__)
@@ -311,22 +311,11 @@ def logout():
     return redirect(url_for('root'))
 
 
-def is_valid(email, password):
-    con = sqlite3.connect('database0.db')
-    cur = con.cursor()
-    cur.execute('SELECT email, password FROM users')
-    data = cur.fetchall()
-    for row in data:
-        if row[0] == email and row[1] == hashlib.md5(password.encode()).hexdigest():
-            return True
-    return False
-
-
 @app.route("/checkout", methods=['GET', 'POST'])
 def payment():
     if 'email' not in session:
         return redirect(url_for('loginForm'))
-    loggedIn, firstName, noOfItems = get_login_details()
+    logged_in, first_name, no_of_items = get_login_details()
     email = session['email']
 
     with sqlite3.connect(DB_PATH) as conn:
@@ -345,8 +334,8 @@ def payment():
     cur.execute("DELETE FROM cart WHERE userId = " + str(userId))
     conn.commit()
 
-    return render_template("checkout.html", product=product, totalPrice=totalPrice, loggedIn=loggedIn,
-                           firstName=firstName, noOfItems=noOfItems)
+    return render_template("checkout.html", product=product, totalPrice=totalPrice, loggedIn=logged_in,
+                           firstName=first_name, noOfItems=no_of_items)
 
 
 @app.route("/register", methods=['GET', 'POST'])
