@@ -1,5 +1,8 @@
+import hashlib
+import os
+import sqlite3
+
 from flask import *
-import sqlite3, hashlib, os
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
