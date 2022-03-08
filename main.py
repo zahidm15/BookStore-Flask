@@ -344,8 +344,8 @@ def register():
         # Parse form data
         password = request.form['password']
         email = request.form['email']
-        firstName = request.form['firstName']
-        lastName = request.form['lastName']
+        first_name = request.form['firstName']
+        last_name = request.form['lastName']
         address1 = request.form['address1']
         address2 = request.form['address2']
         zipcode = request.form['zipcode']
@@ -360,7 +360,7 @@ def register():
                 cur.execute(
                     'INSERT INTO users (password, email, firstName, lastName, address1, address2, zipcode, city, state, country, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                     (
-                    hashlib.md5(password.encode()).hexdigest(), email, firstName, lastName, address1, address2, zipcode,
+                    hashlib.md5(password.encode()).hexdigest(), email, first_name, last_name, address1, address2, zipcode,
                     city, state, country, phone))
 
                 con.commit()
@@ -374,7 +374,7 @@ def register():
 
 
 @app.route("/registerationForm")
-def registrationForm():
+def registration_form():
     return render_template("register.html")
 
 
