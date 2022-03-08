@@ -42,31 +42,31 @@ def admin():
 
 
 @app.route("/addItem", methods=["GET", "POST"])
-def addItem():
+def add_item():
     if request.method == "POST":
         name = request.form['name']
         price = float(request.form['price'])
         description = request.form['description']
         stock = int(request.form['stock'])
-        categoryId = int(request.form['category'])
-        ISBN = int(request.form['ISBN'])
+        category_id = int(request.form['category'])
+        isbn = int(request.form['ISBN'])
 
         # Uploading image procedure
         image = request.files['image']
         if image and allowed_file(image.filename):
             filename = secure_filename(image.filename)
             image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        imagename = filename
+        image_name = filename
         with sqlite3.connect(DB_PATH) as conn:
             try:
                 cur = conn.cursor()
                 cur.execute(
                     '''INSERT INTO products (name, price, description, image, stock, categoryId, ISBN) VALUES (?, ?, ?, ?, ?, ?, ?)''',
-                    (name, price, description, imagename, stock, categoryId, ISBN))
+                    (name, price, description, image_name, stock, category_id, isbn))
                 conn.commit()
                 msg = "added successfully"
             except:
-                msg = "error occured"
+                msg = "error occurred"
                 conn.rollback()
         conn.close()
         print(msg)
@@ -84,40 +84,40 @@ def remove():
 
 
 @app.route("/removeItem")
-def removeItem():
-    productId = request.args.get('productId')
+def remove_item():
+    product_id = request.args.get('productId')
     with sqlite3.connect(DB_PATH) as conn:
         try:
             cur = conn.cursor()
-            cur.execute('DELETE FROM products WHERE productID = ' + productId)
+            cur.execute('DELETE FROM products WHERE productID = ' + product_id)
             conn.commit()
-            msg = "Deleted successsfully"
+            msg = "Deleted successfully"
         except:
             conn.rollback()
-            msg = "Error occured"
+            msg = "Error occurred"
     conn.close()
     print(msg)
     return redirect(url_for('root'))
 
 
 @app.route("/displayCategory")
-def displayCategory():
-    loggedIn, firstName, noOfItems = get_login_details()
-    categoryId = request.args.get("categoryId")
+def display_category():
+    logged_in, first_name, no_of_items = get_login_details()
+    category_id = request.args.get("categoryId")
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
         cur.execute(
-            "SELECT products.productId, products.name, products.price, products.image, products.ISBN, categories.name FROM products, categories WHERE products.categoryId = categories.categoryId AND categories.categoryId = " + categoryId)
+            "SELECT products.productId, products.name, products.price, products.image, products.ISBN, categories.name FROM products, categories WHERE products.categoryId = categories.categoryId AND categories.categoryId = " + category_id)
         data = cur.fetchall()
     conn.close()
-    categoryName = data[0][4]
+    category_name = data[0][4]
     data = parse(data)
-    return render_template('displayCategory.html', data=data, loggedIn=loggedIn, firstName=firstName,
-                           noOfItems=noOfItems, categoryName=categoryName)
+    return render_template('displayCategory.html', data=data, loggedIn=logged_in, firstName=first_name,
+                           noOfItems=no_of_items, categoryName=category_name)
 
 
 @app.route("/account/profile")
-def profileHome():
+def profile_home():
     if 'email' not in session:
         return redirect(url_for('root'))
     loggedIn, firstName, noOfItems = get_login_details()
@@ -125,10 +125,10 @@ def profileHome():
 
 
 @app.route("/account/profile/edit")
-def editProfile():
+def edit_profile():
     if 'email' not in session:
         return redirect(url_for('root'))
-    loggedIn, firstName, noOfItems = get_login_details()
+    logged_in, first_name, no_of_items = get_login_details()
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
         cur.execute(
@@ -136,26 +136,26 @@ def editProfile():
             session['email'] + "'")
         profileData = cur.fetchone()
     conn.close()
-    return render_template("editProfile.html", profileData=profileData, loggedIn=loggedIn, firstName=firstName,
-                           noOfItems=noOfItems)
+    return render_template("editProfile.html", profileData=profileData, loggedIn=logged_in, firstName=first_name,
+                           noOfItems=no_of_items)
 
 
 @app.route("/account/profile/changePassword", methods=["GET", "POST"])
-def changePassword():
+def change_password():
     if 'email' not in session:
         return redirect(url_for('loginForm'))
     if request.method == "POST":
-        oldPassword = request.form['oldpassword']
-        oldPassword = hashlib.md5(oldPassword.encode()).hexdigest()
-        newPassword = request.form['newpassword']
-        newPassword = hashlib.md5(newPassword.encode()).hexdigest()
+        old_password = request.form['oldpassword']
+        old_password = hashlib.md5(old_password.encode()).hexdigest()
+        new_password = request.form['newpassword']
+        new_password = hashlib.md5(new_password.encode()).hexdigest()
         with sqlite3.connect(DB_PATH) as conn:
             cur = conn.cursor()
             cur.execute("SELECT userId, password FROM users WHERE email = '" + session['email'] + "'")
-            userId, password = cur.fetchone()
-            if (password == oldPassword):
+            user_id, password = cur.fetchone()
+            if password == old_password:
                 try:
-                    cur.execute("UPDATE users SET password = ? WHERE userId = ?", (newPassword, userId))
+                    cur.execute("UPDATE users SET password = ? WHERE userId = ?", (new_password, user_id))
                     conn.commit()
                     msg = "Changed successfully"
                 except:
@@ -171,11 +171,11 @@ def changePassword():
 
 
 @app.route("/updateProfile", methods=["GET", "POST"])
-def updateProfile():
+def update_profile():
     if request.method == 'POST':
         email = request.form['email']
-        firstName = request.form['firstName']
-        lastName = request.form['lastName']
+        first_name = request.form['firstName']
+        last_name = request.form['lastName']
         address1 = request.form['address1']
         address2 = request.form['address2']
         zipcode = request.form['zipcode']
@@ -188,7 +188,7 @@ def updateProfile():
                 cur = con.cursor()
                 cur.execute(
                     'UPDATE users SET firstName = ?, lastName = ?, address1 = ?, address2 = ?, zipcode = ?, city = ?, state = ?, country = ?, phone = ? WHERE email = ?',
-                    (firstName, lastName, address1, address2, zipcode, city, state, country, phone, email))
+                    (first_name, last_name, address1, address2, zipcode, city, state, country, phone, email))
 
                 con.commit()
                 msg = "Saved Successfully"
@@ -196,7 +196,7 @@ def updateProfile():
                 con.rollback()
                 msg = "Error occured"
         con.close()
-        return redirect(url_for('editProfile'))
+        return redirect(url_for('edit_profile'))
 
 
 @app.route("/loginForm")
@@ -222,16 +222,16 @@ def login():
 
 @app.route("/productDescription")
 def productDescription():
-    loggedIn, firstName, noOfItems = get_login_details()
-    productId = request.args.get('productId')
+    logged_in, first_name, no_of_items = get_login_details()
+    product_id = request.args.get('productId')
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
         cur.execute(
-            'SELECT productId, name, price, description, image, stock, ISBN FROM products WHERE productId = ' + productId)
-        productData = cur.fetchone()
+            'SELECT productId, name, price, description, image, stock, ISBN FROM products WHERE productId = ' + product_id)
+        product_data = cur.fetchone()
     conn.close()
-    return render_template("productDescription.html", data=productData, loggedIn=loggedIn, firstName=firstName,
-                           noOfItems=noOfItems)
+    return render_template("productDescription.html", data=product_data, loggedIn=logged_in, firstName=first_name,
+                           noOfItems=no_of_items)
 
 
 @app.route("/addToCart")
@@ -239,13 +239,13 @@ def addToCart():
     if 'email' not in session:
         return redirect(url_for('loginForm'))
     else:
-        productId = int(request.args.get('productId'))
+        product_id = int(request.args.get('productId'))
         with sqlite3.connect(DB_PATH) as conn:
             cur = conn.cursor()
             cur.execute("SELECT userId FROM users WHERE email = '" + session['email'] + "'")
-            userId = cur.fetchone()[0]
+            user_id = cur.fetchone()[0]
             try:
-                cur.execute("INSERT INTO cart (userId, productId) VALUES (?, ?)", (userId, productId))
+                cur.execute("INSERT INTO cart (userId, productId) VALUES (?, ?)", (user_id, product_id))
                 conn.commit()
                 msg = "Added successfully"
             except:
@@ -259,7 +259,7 @@ def addToCart():
 def cart():
     if 'email' not in session:
         return redirect(url_for('loginForm'))
-    loggedIn, firstName, noOfItems = get_login_details()
+    logged_in, first_name, no_of_items = get_login_details()
     email = session['email']
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.cursor()
@@ -277,15 +277,15 @@ def cart():
             shipment = postage
         elif row[2] > 1:
             shipment = postage + 1
-    totalPrice = shipment
+    total_price = shipment
     for row in product:
-        totalPrice += row[2]
-    return render_template("cart.html", product=product, postage=shipment, totalPrice=totalPrice, loggedIn=loggedIn,
-                           firstName=firstName, noOfItems=noOfItems)
+        total_price += row[2]
+    return render_template("cart.html", product=product, postage=shipment, totalPrice=total_price, loggedIn=logged_in,
+                           firstName=first_name, noOfItems=no_of_items)
 
 
 @app.route("/removeFromCart")
-def removeFromCart():
+def remove_from_cart():
     if 'email' not in session:
         return redirect(url_for('loginForm'))
     email = session['email']
@@ -326,15 +326,15 @@ def payment():
             "SELECT products.productId, products.name, products.price, products.image FROM products, cart WHERE products.productId = cart.productId AND cart.userId = " + str(
                 userId))
         product = cur.fetchall()
-    totalPrice = 0
+    total_price = 0
     for row in product:
-        totalPrice += row[2]
+        total_price += row[2]
         print(row)
         cur.execute("INSERT INTO Orders (userId, productId) VALUES (?, ?)", (userId, row[0]))
     cur.execute("DELETE FROM cart WHERE userId = " + str(userId))
     conn.commit()
 
-    return render_template("checkout.html", product=product, totalPrice=totalPrice, loggedIn=logged_in,
+    return render_template("checkout.html", product=product, totalPrice=total_price, loggedIn=logged_in,
                            firstName=first_name, noOfItems=no_of_items)
 
 
