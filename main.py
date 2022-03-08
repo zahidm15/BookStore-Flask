@@ -5,9 +5,9 @@ import sqlite3
 from flask import *
 from werkzeug.utils import secure_filename
 
-from constants import DB_PATH, UPLOAD_FOLDER, ALLOWED_EXTENSIONS
+from constants import DB_PATH, UPLOAD_FOLDER
 from login import get_login_details
-from utils import parse
+from utils import parse, allowed_file
 
 app = Flask(__name__)
 app.secret_key = 'random string'
@@ -387,11 +387,6 @@ def register():
 @app.route("/registerationForm")
 def registrationForm():
     return render_template("register.html")
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
 if __name__ == '__main__':
