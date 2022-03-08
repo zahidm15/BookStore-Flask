@@ -23,7 +23,7 @@ def get_login_details() -> tuple[bool, str, int]:
     return logged_in, first_name, no_of_items
 
 
-def is_valid(email, password):
+def is_valid(email, password) -> bool:
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
     cur.execute('SELECT email, password FROM users')
