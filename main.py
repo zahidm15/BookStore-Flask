@@ -143,7 +143,7 @@ def edit_profile():
 @app.route("/account/profile/changePassword", methods=["GET", "POST"])
 def change_password():
     if 'email' not in session:
-        return redirect(url_for('loginForm'))
+        return redirect(url_for('login_form'))
     if request.method == "POST":
         old_password = request.form['oldpassword']
         old_password = hashlib.md5(old_password.encode()).hexdigest()
@@ -200,7 +200,7 @@ def update_profile():
 
 
 @app.route("/loginForm")
-def loginForm():
+def login_form():
     if 'email' in session:
         return redirect(url_for('root'))
     else:
@@ -221,7 +221,7 @@ def login():
 
 
 @app.route("/productDescription")
-def productDescription():
+def product_description():
     logged_in, first_name, no_of_items = get_login_details()
     product_id = request.args.get('productId')
     with sqlite3.connect(DB_PATH) as conn:
@@ -237,7 +237,7 @@ def productDescription():
 @app.route("/addToCart")
 def add_to_cart():
     if 'email' not in session:
-        return redirect(url_for('loginForm'))
+        return redirect(url_for('login_form'))
     else:
         product_id = int(request.args.get('productId'))
         with sqlite3.connect(DB_PATH) as conn:
@@ -258,7 +258,7 @@ def add_to_cart():
 @app.route("/cart")
 def cart():
     if 'email' not in session:
-        return redirect(url_for('loginForm'))
+        return redirect(url_for('login_form'))
     logged_in, first_name, no_of_items = get_login_details()
     email = session['email']
     with sqlite3.connect(DB_PATH) as conn:
@@ -287,7 +287,7 @@ def cart():
 @app.route("/removeFromCart")
 def remove_from_cart():
     if 'email' not in session:
-        return redirect(url_for('loginForm'))
+        return redirect(url_for('login_form'))
     email = session['email']
     productId = int(request.args.get('productId'))
     with sqlite3.connect(DB_PATH) as conn:
@@ -314,7 +314,7 @@ def logout():
 @app.route("/checkout", methods=['GET', 'POST'])
 def payment():
     if 'email' not in session:
-        return redirect(url_for('loginForm'))
+        return redirect(url_for('login_form'))
     logged_in, first_name, no_of_items = get_login_details()
     email = session['email']
 
