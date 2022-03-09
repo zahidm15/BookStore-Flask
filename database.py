@@ -43,7 +43,7 @@ conn.execute('''CREATE TABLE categories
 		name TEXT
 		)''')
 
-conn.execute('''CREATE TABLE Order
+conn.execute('''CREATE TABLE orders
 		(userId INTEGER,
 		productId INTEGER,
 		FOREIGN KEY(userId) REFERENCES users(userId),
