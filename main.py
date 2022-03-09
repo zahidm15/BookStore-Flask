@@ -235,7 +235,7 @@ def productDescription():
 
 
 @app.route("/addToCart")
-def addToCart():
+def add_to_cart():
     if 'email' not in session:
         return redirect(url_for('loginForm'))
     else:
